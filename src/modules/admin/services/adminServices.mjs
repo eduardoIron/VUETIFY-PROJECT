@@ -34,3 +34,14 @@ export const postUsuarios = async (values) => {
         return error.response;
     }
 }
+
+export const putUsuarios = async(values,id) => {
+    try{
+        let token = sessionStorage.getItem("token");
+        const config = {headers:{"x-token": token}}
+        const response = await userApi.put(`/usuarios/${id}`, values, config);
+        return response;
+    }catch(error){
+        return error.response;
+    }
+}

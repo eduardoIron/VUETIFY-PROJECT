@@ -100,13 +100,13 @@ const registroUsuario = async () => {
             activateSnack("Usuario registrado con éxito", "success");
             limpiarCampos();
         } else {
-            const errorMsg = registro?.data?.msg || "Error de conexión o servidor";
+            const errorMsg = registro?.data?.msg || "Error de conexión";
             activateSnack(errorMsg, "error");
         }
 
     } catch (error) {
         console.error(error);
-        activateSnack("Error crítico en el cliente", "error");
+        activateSnack("Error en el usuario", "error");
     } finally {
         cargando.value = false;
     }

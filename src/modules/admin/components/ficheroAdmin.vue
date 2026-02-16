@@ -38,7 +38,7 @@
 
       <v-tabs-window-item value="Actualizar usuario">
         <v-card-text>
-          <h3>Aquí va el Formulario de Actualización</h3>
+          <putUsuariosView/>
         </v-card-text>
       </v-tabs-window-item>
  
@@ -57,6 +57,7 @@
   import { ref } from 'vue'
   import getUsuariosView from '../views/getUsuariosView.vue';
   import postUsuariosView from '../views/postUsuariosView.vue';
+  import putUsuariosView from '../views/putUsuariosView.vue';
   // Variable que controla qué pestaña está abierta
   const tab = ref(null)
 

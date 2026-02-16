@@ -26,7 +26,7 @@ const headers = [
 const listaUsuarios = ref([]); 
 const cargando = ref(false);   
 
-const cargarDatos = async () => {
+ const cargarDatos = async () => {
     cargando.value = true;
     try {
         const respuesta = await getUsuarios();
