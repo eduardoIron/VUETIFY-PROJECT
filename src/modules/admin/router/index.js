@@ -1,11 +1,11 @@
-import ficheroAdminView from "@/modules/admin/views/ficheroAdminView";
+import ficheroAdminRenovadoView from "@/modules/admin/views/ficheroAdminRenovadoView";
 
 export default {
     children: [
         {
             path:"/admin",
-            name: "ficheroAdmin",
-            component: () => Promise.resolve(ficheroAdminView),
+            name: "ficheroAdminRenovado",
+            component: () => Promise.resolve(ficheroAdminRenovadoView),
             beforeEnter: (to, from, next) => {
                 if(!sessionStorage.getItem("token"))next("/");
                 else next();

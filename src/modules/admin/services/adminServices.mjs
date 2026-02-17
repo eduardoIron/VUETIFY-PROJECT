@@ -45,3 +45,15 @@ export const putUsuarios = async(values,id) => {
         return error.response;
     }
 }
+
+export const deleteUsuarios = async(id) =>{
+    try{
+        let token = sessionStorage.getItem("token");
+        const config = {headers:{"x-token": token}}
+        const response = await userApi.delete(`/usuarios/${id}`, config);
+        return response;
+
+    }catch(error){
+        return error.response; 
+    }
+}

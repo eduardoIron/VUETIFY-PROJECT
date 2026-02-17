@@ -2,7 +2,7 @@
   <v-sheet border rounded>
     <v-data-table
       :headers="headers"
-      :hide-default-footer="listaUsuarios.length < 10 "
+      :hide-default-footer="listaUsuarios.length < 11"
       :items="listaUsuarios"
     >
       <template v-slot:top>
@@ -10,14 +10,14 @@
           <v-toolbar-title>
             <v-icon color="medium-emphasis" icon="mdi-book-multiple" size="x-small" start></v-icon>
 
-            Popular books
+            Facultad de quimica
           </v-toolbar-title>
 
           <v-btn
             class="me-2"
             prepend-icon="mdi-plus"
             rounded="lg"
-            text="Add a Book"
+            text="Registrar usuario"
             border
             @click="add"
           ></v-btn>
@@ -32,12 +32,11 @@
         </v-chip>
       </template>
 
-      <template v-slot:[`item.actions`]="{ item }">
+      <template v-slot:item.actions="{ item }">
+        <div class="d-flex ga-2 justify-end">
+          <v-icon color="medium-emphasis" icon="mdi-pencil" size="small" @click="edit(item.id)"></v-icon>
 
-        <div>
-          <v-icon color="primary"  icon="mdi-pencil" size="small" @click="edit(item.id)"></v-icon>
-
-          <v-icon color="error" icon="mdi-delete" size="small" @click="remove(item.id)"></v-icon>
+          <v-icon color="medium-emphasis" icon="mdi-delete" size="small" @click="remove(item.id)"></v-icon>
         </div>
       </template>
 
@@ -56,14 +55,16 @@
 
   <v-dialog v-model="dialog" max-width="500">
     <v-card
-      :subtitle="`${isEditing ? 'Update' : 'Create'} your favorite book`"
-      :title="`${isEditing ? 'Edit' : 'Add'} a Book`"
+      :title="`${isEditing ? 'Editar' : 'Registrar'} usuario`"
     >
-    
-    <template v-slot:text>
+      <template v-slot:text>
         <v-row>
           <v-col cols="12">
             <v-text-field v-model="formModel.nombre" label="Nombre"></v-text-field>
+          </v-col>
+
+          <v-col cols="12" md="6">
+            <v-text-field v-model.number="formModel.numCuenta" label="Numero de cuenta"></v-text-field>
           </v-col>
 
           <v-col cols="12" md="6">
@@ -71,21 +72,21 @@
           </v-col>
 
           <v-col cols="12" md="6">
+            <v-text-field v-model="formModel.pass" label="Contraseña"></v-text-field>
+          </v-col>
+
+          <v-col cols="12" md="6">
             <v-text-field v-model="formModel.numCelular" label="Numero celular"></v-text-field>
           </v-col>
 
-
           <v-col cols="12" md="6">
-            <v-select v-model="formModel.estado" :items="['0', '1']" label="Estado"></v-select>
+            <v-select v-model="formModel.estado" :items="['Activo', 'Inactivo']" label="Estado"></v-select>
           </v-col>
 
           <v-col cols="12" md="6">
             <v-select v-model="formModel.rol" :items="['ADMIN_USER', 'USER']" label="Rol"></v-select>
           </v-col>
 
-            <v-col cols="12" md="6">
-            <v-number-input v-model="formModel.pages" :min="1" label="Pages"></v-number-input>
-          </v-col>
 
         </v-row>
       </template>
@@ -102,17 +103,17 @@
     </v-card>
   </v-dialog>
 
-      <v-snackbar v-model="mostrarSnack" :color="colorSnack">
+        <v-snackbar v-model="mostrarSnack" :color="colorSnack">
       {{ mensajeSnack }}
     </v-snackbar>
-
 </template>
 <script setup>
-  import { onMounted, ref, shallowRef, toRef } from 'vue'
-  import { postUsuarios } from "@/modules/admin/services/adminServices"; 
-  import { putUsuarios } from "@/modules/admin/services/adminServices";
-  import { getUsuarios } from "@/modules/admin/services/adminServices";
-  import { deleteUsuarios } from "@/modules/admin/services/adminServices";
+import { onMounted, ref, shallowRef, toRef } from 'vue'
+import { getUsuarios } from "@/modules/admin/services/adminServices";
+import { postUsuarios } from "@/modules/admin/services/adminServices";
+import { putUsuarios } from "@/modules/admin/services/adminServices";
+import { deleteUsuarios } from "@/modules/admin/services/adminServices";
+
   const currentYear = new Date().getFullYear()
 
   function createNewRecord () {
@@ -120,25 +121,26 @@
       nombre: '',
       numCuenta: '',
       correo: '',
+      pass: '',
       numCelular: '',
       estado: '',
       rol: ''
     }
   }
 
+
+
   const books = ref([])
   const formModel = ref(createNewRecord())
   const dialog = shallowRef(false)
   const isEditing = toRef(() => !!formModel.value.id)
 
-  const listaUsuarios = ref([]);
-  
-  const mostrarSnack = ref(false);
+  const listaUsuarios = ref ([]);
+    const mostrarSnack = ref(false);
    const mensajeSnack = ref("");
    const colorSnack = ref("error");
 
-
-   const headers = [
+  const headers = [
    { title: 'ID', key: 'id', align: 'start' },
    { title: 'Nombre', key: 'nombre' },
    { title: 'Numero de cuenta', key: 'numCuenta' },
@@ -149,55 +151,39 @@
    {title:'Acciones', key:'actions', align:'end', sortable:false},
  ]
 
-
   onMounted(() => {
     reset()
   })
 
-  function add () {
-    formModel.value = createNewRecord()
-    dialog.value = true
-  }
 
-  const edit = async(id) => {
+const add = () => {
+    formModel.value = createNewRecord(); 
+    dialog.value = true; 
+}
+
+    const edit = async(id) => {
     const found = listaUsuarios.value.find(listaUsuarios => listaUsuarios.id === id)
 
-    
     formModel.value = {
       id: found.id,
       nombre: found.nombre,
       numCuenta: found.numCuenta,
       correo: found.correo,
+
       numCelular: found.numCelular,
       estado: found.estado,
       rol: found.rol,
     }
 
-    const nombrePrueba = id.nombre;
-    console.log(`Nombre PRUEBA: ${nombrePrueba}`)
-
-      console.log(`Nombre: ${formModel.value.nombre}`)
-      console.log(`ID: ${formModel.value.id}`)
-      const idUsuario = formModel.value.id;
-        const actualizaciones = {
-            nombre: formModel.value.nombre,
-            numCuenta: formModel.value.numCuenta,
-            correo: formModel.value.correo,
-            numCelular: formModel.value.numCelular,
-            estado: formModel.value.estado,
-            rol: formModel.value.rol,
-        };
-
     dialog.value = true
   }
 
-  const remove = async(id) => {
+   const remove = async(id) => {
     const index = listaUsuarios.value.findIndex(listaUsuarios => listaUsuarios.id === id);
     try{
       const baja = await deleteUsuarios(listaUsuarios.value[index].id);
       if (baja?.status === 200) {
         listaUsuarios.value[index].estado = '0';
-          //formModel.value.estado='0';
             activateSnack("Usuario dado de baja con éxito", "success");
         } else {
             const errorMsg = baja?.data?.msg || "Error de conexión";
@@ -207,11 +193,9 @@
         console.error(error);
         activateSnack("Error en el usuario", "error");
     }
-
-    //books.value.splice(index, 1)
   }
 
-  const  save = async() => {
+const  save = async() => {
     if (isEditing.value) {
       const index = listaUsuarios.value.findIndex(listaUsuarios => listaUsuarios.id === formModel.value.id)
       
@@ -235,9 +219,23 @@
         activateSnack("Error en el usuario", "error");
     }
     
-    
-    
-    
+    }else{
+        try {
+        const registro = await postUsuarios(formModel.value);
+
+        if (registro?.status === 200 || registro?.status === 201) {
+            activateSnack("Usuario registrado con éxito", "success");
+            dialog.value = false; 
+
+        } else {
+            const errorMsg = registro?.data?.msg || "Error de conexión";
+            activateSnack(errorMsg, "error");
+        }
+
+    } catch (error) {
+        console.error(error);
+        activateSnack("Error en el servidor", "error");
+    }
     }
 
     
@@ -245,7 +243,14 @@
     dialog.value = false
   }
 
-  
+
+
+
+  //function remove (id) {
+    //const index = books.value.findIndex(book => book.id === id)
+    //books.value.splice(index, 1)
+  //}
+
 
   const reset = async () => {
     dialog.value = false
@@ -270,12 +275,4 @@
     mostrarSnack.value = true;
 };
 
-  
-
-
-   
-
-
 </script>
-
-
