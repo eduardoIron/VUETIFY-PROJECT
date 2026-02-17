@@ -80,10 +80,6 @@
           </v-col>
 
           <v-col cols="12" md="6">
-            <v-select v-model="formModel.estado" :items="['Activo', 'Inactivo']" label="Estado"></v-select>
-          </v-col>
-
-          <v-col cols="12" md="6">
             <v-select v-model="formModel.rol" :items="['ADMIN_USER', 'USER']" label="Rol"></v-select>
           </v-col>
 
@@ -225,6 +221,7 @@ const  save = async() => {
 
         if (registro?.status === 200 || registro?.status === 201) {
             activateSnack("Usuario registrado con éxito", "success");
+            //al array de items de la tabla hacer unshift-> array.unshift (meter el objeto), back obtener el id 
             dialog.value = false; 
 
         } else {
