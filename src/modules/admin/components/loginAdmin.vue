@@ -5,7 +5,7 @@
       <v-form v-model="form" @submit.prevent="ingresaAdmin">
         
         <v-text-field
-          v-model="correo"
+          v-model="acceso"
           :readonly="loading"
           :rules="[required]"
           class="mb-2"
@@ -55,6 +55,7 @@ const router = useRouter();
 const form = ref(false);  
 const loading = ref(false); 
 
+const acceso = ref("");
 const correo = ref("");
 const pass = ref("");
 const numCuenta = ref("");
@@ -72,40 +73,50 @@ const ingresaAdmin = async () => {
     if (!form.value) return;
 
     loading.value = true;
+    try{
+      const datosIngreso = {
+        pass: pass.value,
+      }
 
-    try {
-        const respuesta = await loginAdmin({
-            correo: correo.value,
-            numCuenta: numCuenta.value,
-            pass: pass.value,
-        
-        });
-        console.log(`correo: ${correo.value}`);
-        console.log(`Numero cuenta: ${numCuenta.value}`);
+      if(acceso.value.includes('@')){
+        datosIngreso.correo = acceso.value
+      }else{
+        datosIngreso.numCuenta = acceso.value
+      }
+      const respuesta = await loginAdmin(datosIngreso);
 
-        if (respuesta && respuesta.status === 200) {
-            
-            sessionStorage.setItem("token", respuesta.data.token);
-            sessionStorage.setItem("admin", correo.value);
-            sessionStorage.setItem("admin", numCuenta.value);
-            
-            activateSnack("Bienvenido Administrador", "success");
-            
-            setTimeout(() => {
-                router.push("/admin"); 
-            }, 1000);
+      console.log(`Datos ingreso: ${datosIngreso.numCuenta}`);
+      console.log(`Contraseña: ${datosIngreso.pass}`);
 
-        } else {
-            const errorMsg = respuesta?.data?.msg || "Datos de acceso inválidos";
-            activateSnack(errorMsg, "error");
-        }
+      if (respuesta && respuesta.status === 200) {
+          
+      sessionStorage.setItem("token", respuesta.data.token);
+      sessionStorage.setItem("admin", acceso.value);
+          
+      activateSnack("Bienvenido Administrador", "success");
+          
+           setTimeout(() => {
+               router.push("/admin");
+           }, 1000);
 
-    } catch (error) {
-        console.error(error);
-        activateSnack("Ocurrió un error en el servidor", "error");
-    } finally {
-        loading.value = false; 
+
+       } else {
+           const errorMsg = respuesta?.data?.msg || "Datos de acceso inválidos";
+           activateSnack(errorMsg, "error");
+       }
+
+
+
+    }catch(error){
+       console.error(error);
+       activateSnack("Ocurrió un error en el servidor", "error");
+
+
+    }finally{
+       loading.value = false;
     }
+
+
 }
 
 const activateSnack = (mensaje, color = "primary") => {

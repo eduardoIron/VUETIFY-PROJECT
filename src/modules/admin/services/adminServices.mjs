@@ -6,6 +6,8 @@ const userApi = axios.create({
 });
 
 export const loginAdmin = async (values) => {
+
+    console.log(`Prueba pass: ${values}`)
    try{
        const response = await userApi.post('/auth/login',values);
        return response;
