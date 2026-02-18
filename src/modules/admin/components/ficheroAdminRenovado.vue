@@ -291,6 +291,7 @@ const salir = () => {
   setTimeout(() => {
       router.push("/"); 
   }, 1000);
+  sessionStorage.clear();
   activateSnack("Hasta luego", "success");
 }
 
