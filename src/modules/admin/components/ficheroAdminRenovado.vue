@@ -12,15 +12,28 @@
 
             Facultad de quimica
           </v-toolbar-title>
+            <div class="d-flex justify-center w-100">
+              <v-btn
+                class="me-2"
+                prepend-icon="mdi-plus"
+                rounded="lg"
+                text="Registrar usuario"
+                border
+                @click="add"
+              ></v-btn>
+            </div>
 
-          <v-btn
-            class="me-2"
-            prepend-icon="mdi-plus"
-            rounded="lg"
-            text="Registrar usuario"
-            border
-            @click="add"
-          ></v-btn>
+            <div>
+              <v-btn
+                class="me-2"
+                color="blue"
+                rounded="lg"
+                text="Cerrar sesion"
+                border
+                @click="salir"
+              >
+              </v-btn>
+            </div>
         </v-toolbar>
       </template>
 
@@ -109,6 +122,7 @@ import { getUsuarios } from "@/modules/admin/services/adminServices";
 import { postUsuarios } from "@/modules/admin/services/adminServices";
 import { putUsuarios } from "@/modules/admin/services/adminServices";
 import { deleteUsuarios } from "@/modules/admin/services/adminServices";
+import { useRouter } from "vue-router"; 
 
   const currentYear = new Date().getFullYear()
 
@@ -135,6 +149,7 @@ import { deleteUsuarios } from "@/modules/admin/services/adminServices";
     const mostrarSnack = ref(false);
    const mensajeSnack = ref("");
    const colorSnack = ref("error");
+   const router = useRouter(); 
 
   const headers = [
    { title: 'ID', key: 'id', align: 'start' },
@@ -271,5 +286,12 @@ const  save = async() => {
     colorSnack.value = color;
     mostrarSnack.value = true;
 };
+
+const salir = () => {
+  setTimeout(() => {
+      router.push("/"); 
+  }, 1000);
+  activateSnack("Hasta luego", "success");
+}
 
 </script>

@@ -54,12 +54,15 @@ import { loginAdmin } from "@/modules/admin/services/adminServices";
 const router = useRouter(); 
 const form = ref(false);  
 const loading = ref(false); 
+
 const correo = ref("");
 const pass = ref("");
+const numCuenta = ref("");
 
 const mostrarSnack = ref(false);
 const mensajeSnack = ref("");
 const colorSnack = ref("error");
+
 
 const required = (v) => {
   return !!v || "Este campo es obligatorio";
@@ -73,13 +76,18 @@ const ingresaAdmin = async () => {
     try {
         const respuesta = await loginAdmin({
             correo: correo.value,
+            numCuenta: numCuenta.value,
             pass: pass.value,
+        
         });
+        console.log(`correo: ${correo.value}`);
+        console.log(`Numero cuenta: ${numCuenta.value}`);
 
         if (respuesta && respuesta.status === 200) {
             
             sessionStorage.setItem("token", respuesta.data.token);
             sessionStorage.setItem("admin", correo.value);
+            sessionStorage.setItem("admin", numCuenta.value);
             
             activateSnack("Bienvenido Administrador", "success");
             
