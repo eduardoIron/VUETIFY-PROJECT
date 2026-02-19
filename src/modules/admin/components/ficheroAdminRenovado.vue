@@ -73,23 +73,23 @@
       <template v-slot:text>
         <v-row>
           <v-col cols="12">
-            <v-text-field v-model="formModel.nombre" label="Nombre"></v-text-field>
+            <v-text-field v-model="formModel.nombre" :rules="[rules.requerido]" label="Nombre(Empezando por apelidos )"></v-text-field>
           </v-col>
 
           <v-col cols="12" md="6">
-            <v-text-field v-model.number="formModel.numCuenta" label="Numero de cuenta"></v-text-field>
+            <v-text-field v-model.number="formModel.numCuenta" :rules="[rules.requerido, rules.numeroCuenta, rules.numeroCuentaLongitud]" label="Numero de cuenta"></v-text-field>
           </v-col>
 
           <v-col cols="12" md="6">
-            <v-text-field v-model="formModel.correo" label="Correo"></v-text-field>
+            <v-text-field v-model="formModel.correo" :rules = "[rules.requerido, rules.correo]" label="Correo"></v-text-field>
           </v-col>
 
           <v-col cols="12" md="6">
-            <v-text-field v-model="formModel.pass" label="Contraseña"></v-text-field>
+            <v-text-field v-model="formModel.pass" :rules = "[rules.requerido]" label="Contraseña"></v-text-field>
           </v-col>
 
           <v-col cols="12" md="6">
-            <v-text-field v-model="formModel.numCelular" label="Numero celular"></v-text-field>
+            <v-text-field v-model="formModel.numCelular" :rules = "[rules.requerido, rules.numeroTelefono]" label="Numero celular"></v-text-field>
           </v-col>
 
           <v-col cols="12" md="6">
@@ -123,6 +123,7 @@ import { postUsuarios } from "@/modules/admin/services/adminServices";
 import { putUsuarios } from "@/modules/admin/services/adminServices";
 import { deleteUsuarios } from "@/modules/admin/services/adminServices";
 import { useRouter } from "vue-router"; 
+import {rules} from "@/modules/admin/constants/rules";
 
   const currentYear = new Date().getFullYear()
 
@@ -206,53 +207,54 @@ const add = () => {
     }
   }
 
-const  save = async() => {
+const save = async() => {
+    // Force the text to uppercase before doing anything else
+    formModel.value.nombre = (formModel.value.nombre || '').toUpperCase().trim();
+
     if (isEditing.value) {
-      const index = listaUsuarios.value.findIndex(listaUsuarios => listaUsuarios.id === formModel.value.id)
-      
-      listaUsuarios.value[index] = formModel.value
-      console.log(`Nombre actualizo en save : ${listaUsuarios.value[index].nombre}`)
-    try{
+      const index = listaUsuarios.value.findIndex(u => u.id === formModel.value.id)
+      listaUsuarios.value[index] = { ...formModel.value }
 
-    console.log(`Nombre despues actualizo: ${formModel.value.nombre}`)
-
-        const actualizacion = await putUsuarios(listaUsuarios.value[index], listaUsuarios.value[index].id);
+      try {
+        const actualizacion = await putUsuarios(formModel.value, formModel.value.id);
 
         if (actualizacion?.status === 200) {
             activateSnack("Usuario actualizado con éxito", "success");
+            dialog.value = false;
         } else {
             const errorMsg = actualizacion?.data?.msg || "Error de conexión";
             activateSnack(errorMsg, "error");
         }
-
-    }catch(error){
-        console.error(error);
-        activateSnack("Error en el usuario", "error");
-    }
-    
-    }else{
-        try {
+      } catch(error) {
+          console.error(error);
+          activateSnack("Error en el usuario", "error");
+      }
+      
+    } else {
+      try {
         const registro = await postUsuarios(formModel.value);
 
         if (registro?.status === 200 || registro?.status === 201) {
             activateSnack("Usuario registrado con éxito", "success");
-            //al array de items de la tabla hacer unshift-> array.unshift (meter el objeto), back obtener el id 
-            dialog.value = false; 
+            
+            // Add the new user to the screen immediately
+            listaUsuarios.value.unshift({
+              ...formModel.value,
+              id: registro?.data?.id || registro?.data?.usuario?.id || 'N/A',
+              estado: '1',
+              rol: formModel.value.rol || 'USER'
+            });
 
+            dialog.value = false; 
         } else {
             const errorMsg = registro?.data?.msg || "Error de conexión";
             activateSnack(errorMsg, "error");
         }
-
-    } catch (error) {
-        console.error(error);
-        activateSnack("Error en el servidor", "error");
+      } catch (error) {
+          console.error(error);
+          activateSnack("Error en el servidor", "error");
+      }
     }
-    }
-
-    
-
-    dialog.value = false
   }
 
 
@@ -265,14 +267,17 @@ const  save = async() => {
 
 
   const reset = async () => {
-    dialog.value = false
-    formModel.value = createNewRecord()
+    dialog.value = false;
+    formModel.value = createNewRecord();
     try {
        const respuesta = await getUsuarios();
-
   
        if (respuesta.status === 200) {
-           listaUsuarios.value = respuesta.data;
+           // Convert the names to uppercase here
+           listaUsuarios.value = respuesta.data.map(u => ({
+               ...u,
+               nombre: (u.nombre || '').toUpperCase().trim()
+           }));
        } else {
            console.error("Error al cargar usuarios", respuesta);
        }
@@ -291,7 +296,7 @@ const salir = () => {
   setTimeout(() => {
       router.push("/"); 
   }, 1000);
-  sessionStorage.clear();
+  localStorage.clear();
   activateSnack("Hasta luego", "success");
 }
 

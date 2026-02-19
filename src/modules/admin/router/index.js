@@ -7,7 +7,7 @@ export default {
             name: "ficheroAdminRenovado",
             component: () => Promise.resolve(ficheroAdminRenovadoView),
             beforeEnter: (to, from, next) => {
-                if(!sessionStorage.getItem("token"))next("/");
+                if(!localStorage.getItem("token"))next("/");
                 else next();
             },
         }

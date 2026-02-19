@@ -28,7 +28,7 @@ export const getUsuarios = async () => {
 
 export const postUsuarios = async (values) => {
     try {
-        let token = sessionStorage.getItem("token");
+        let token = localStorage.getItem("token");
         const config = {headers:{"x-token":token}}
         const response = await userApi.post('/usuarios', values, config); 
         return response;
@@ -39,7 +39,7 @@ export const postUsuarios = async (values) => {
 
 export const putUsuarios = async(values,id) => {
     try{
-        let token = sessionStorage.getItem("token");
+        let token = localStorage.getItem("token");
         const config = {headers:{"x-token": token}}
         const response = await userApi.put(`/usuarios/${id}`, values, config);
         return response;
@@ -50,7 +50,7 @@ export const putUsuarios = async(values,id) => {
 
 export const deleteUsuarios = async(id) =>{
     try{
-        let token = sessionStorage.getItem("token");
+        let token = localStorage.getItem("token");
         const config = {headers:{"x-token": token}}
         const response = await userApi.delete(`/usuarios/${id}`, config);
         return response;

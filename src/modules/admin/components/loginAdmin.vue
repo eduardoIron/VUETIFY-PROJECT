@@ -90,8 +90,8 @@ const ingresaAdmin = async () => {
 
       if (respuesta && respuesta.status === 200) {
           
-      sessionStorage.setItem("token", respuesta.data.token);
-      sessionStorage.setItem("admin", acceso.value);
+      localStorage.setItem("token", respuesta.data.token);
+      localStorage.setItem("admin", acceso.value);
           
       activateSnack("Bienvenido Administrador", "success");
           
