@@ -208,7 +208,7 @@ const add = () => {
   }
 
 const save = async() => {
-    // Force the text to uppercase before doing anything else
+
     formModel.value.nombre = (formModel.value.nombre || '').toUpperCase().trim();
 
     if (isEditing.value) {
@@ -237,7 +237,6 @@ const save = async() => {
         if (registro?.status === 200 || registro?.status === 201) {
             activateSnack("Usuario registrado con éxito", "success");
             
-            // Add the new user to the screen immediately
             listaUsuarios.value.unshift({
               ...formModel.value,
               id: registro?.data?.id || registro?.data?.usuario?.id || 'N/A',
@@ -273,7 +272,6 @@ const save = async() => {
        const respuesta = await getUsuarios();
   
        if (respuesta.status === 200) {
-           // Convert the names to uppercase here
            listaUsuarios.value = respuesta.data.map(u => ({
                ...u,
                nombre: (u.nombre || '').toUpperCase().trim()
